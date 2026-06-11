@@ -5,4 +5,4 @@ from db import AsyncSessionLocal
 class UserClient:
     def get_session(self):
         return AsyncSessionLocal()
-
+#Ligero cambio

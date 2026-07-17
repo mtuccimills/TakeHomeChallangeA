@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import select, func, delete as sql_delete, update as sql_update
 
-from routers.pokemon.entity import PaginatedPokemonResponse, PokemonResponse
+from routers.pokemons.entity import PaginatedPokemonResponse, PokemonResponse
 #from sqlalchemy.ext.asyncio import AsyncSession
 #from model import Post
 from .entity import UserCreate, UserUpdate, UserPrivate

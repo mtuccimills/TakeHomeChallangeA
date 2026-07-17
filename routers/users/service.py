@@ -7,7 +7,7 @@ from .entity import (
     Token,
     ChangePasswordRequest
 )
-from routers.pokemon.entity import PaginatedPokemonResponse
+from routers.pokemons.entity import PaginatedPokemonResponse
 from fastapi import BackgroundTasks, Depends, HTTPException, status, UploadFile
 
 from typing import Annotated

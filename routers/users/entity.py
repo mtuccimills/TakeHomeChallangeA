@@ -55,8 +55,9 @@ class Token(BaseModel):
 class UserPublic(BaseModel):
     id:int
     username: str
+    # Validar si se qutia lo de la imagen o cómo se procede. Local o S3 con AWS
     image_file: str | None = None
-    image_path: str | None = None
+    image_path: str
 
     model_config = ConfigDict(
         from_attributes=True,

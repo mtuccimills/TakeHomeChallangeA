@@ -9,14 +9,14 @@ from routers.users.entity import UserPublic
 from pydantic import BaseModel, ConfigDict, Field
 
 class PokemonBase(BaseModel):
-    name: str = Field(min_length=1, max_length=100,name="name",alias="name")
+    pokemon_id: int = Field(min=1,max=10000,name="pokemon_id",alias="pokemon_id")
 
     model_config = {
         "from_attributes": True,
         "populate_by_name": True, 
         "json_schema_extra":{
             "example": {
-                "name": "Pikachu",
+                "pokemon_id": "1",
             }
         }
     }
@@ -25,14 +25,14 @@ class PokemonCreate(PokemonBase):
     pass
 
 class PokemonUpdate(BaseModel):
-    name: str | None = Field(default=None, min_length=1, max_length=100,name="name")
+    pokemon_id: int = Field(min=1,max=10000,name="pokemon_id",alias="pokemon_id")
 
     model_config = {
         "from_attributes": True,
         "populate_by_name": True, 
         "json_schema_extra":{
             "example": {
-                "name": "Pikachu",
+                "pokemon_id": "1",
             }
         }
     }
@@ -45,7 +45,7 @@ class PokemonResponse(PokemonBase):
         json_schema_extra={
             "example": {
                 "id": 1,
-                "name": "Pikachu",
+                "pokemon_id": "1",
                 "author": "Matias Tucci",
                 "date_captured": "2023-01-01",
                 "user_id": "10",
@@ -56,7 +56,7 @@ class PokemonResponse(PokemonBase):
     id: int
     user_id:int
     date_captured:datetime
-    author: UserPublic
+    owner: UserPublic
 
 
 class PaginatedPokemonResponse(BaseModel):

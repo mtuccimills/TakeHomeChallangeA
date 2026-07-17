@@ -14,7 +14,7 @@ from .entity import (
 )
 from .service import UserService
 from .repository import UserRepository
-from routers.pokemon.entity import PaginatedPokemonResponse
+from routers.pokemons.entity import PaginatedPokemonResponse
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status, UploadFile
 #from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession

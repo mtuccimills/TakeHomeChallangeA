@@ -31,6 +31,12 @@ class User(Base):
         cascade="all, delete-orphan",
     )
 
+    @property
+    def image_path(self) -> str:
+        if self.image_file:
+            return f"https://{settings.s3_bucket_name}.s3.{settings.s3_region}.amazonaws.com/profile_pics/{self.image_file}"
+        return "/static/profile_pics/default.jpg"
+
 class PasswordResetToken(Base):
     __tablename__ = "password_reset_tokens"
 
@@ -54,7 +60,7 @@ class Pokemon(Base):
     __tablename__ = "pokemon"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    pokemon_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"),
         nullable=False,

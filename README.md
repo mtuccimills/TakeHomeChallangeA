@@ -60,6 +60,7 @@ The application follows a layered **Clean Architecture** (controller → service
 - UV: uv is a dependency manager that allows us to have a better segregation between our projects and improves speed compare to pip.
 - SQLAlchemy: Because it is an ORM which is easy to use and has great documentation.
 - Docker: To make portabele the app
+- Docker profiles: I decided to use a test profile on the docker-compose to prevent us from generating second docker-coompose file soley for testing purposes
 - PyTest: Is the most common library for testing in python.
 - E2E Test:  Testing was ddone E2E because we wanted to evaluate all parts of our clean architecture. We don't need to do unit test on every funtion of every file, a E2E test evaluating every endpoint is good enough.
 

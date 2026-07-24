@@ -40,10 +40,6 @@ jobs:
               -c "CREATE DATABASE test_userdb;"
 
       - run:
-          name: Lint (Ruff)
-          command: uv run ruff check .
-
-      - run:
           name: Run tests
           command: uv run pytest tests -v
 

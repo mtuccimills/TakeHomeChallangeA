@@ -8,6 +8,10 @@ The application follows a layered **Clean Architecture** (controller → service
 
 ---
 
+## Badges
+
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/mtuccimills/TakeHomeChallangeA/tree/main.svg?style=svg&circle-token=CCIPRJ_ABxG9X9P2ZXkX9p84DcFim_84accbb01b9d1b36d1527cf250414fbb99bf6aa3)](https://dl.circleci.com/status-badge/redirect/gh/mtuccimills/TakeHomeChallangeA/tree/main)
+
 ## Features
 
 - **User management** — registration, listing, retrieval by id / email / username, full and partial updates, and deletion, with ownership enforcement so users can only modify their own account.
@@ -223,6 +227,6 @@ For a production deployment, the recommended adjustments are: supply strong secr
 - Error handling could be improved (prevent 500 errors)
 - A seed migration would be useful to have an already working app with data
 - Deployment could be done
-- Add badges
+
 
 

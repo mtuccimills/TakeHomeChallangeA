@@ -47,6 +47,32 @@ jobs:
           name: Run tests
           command: uv run pytest tests -v
 
+      - run:
+          name: Run migrations
+          command: uv run alembic upgrade head
+          environment:
+            DATABASE_URL: postgresql+psycopg://postgres:password@localhost:5432/userdb
+      - run:
+          name: Start app and health-check
+          command: |
+            # Run migrations first (real startup does this)
+            uv run alembic upgrade head
+            # Start the server in the background
+            uv run uvicorn main:app --host 0.0.0.0 --port 8000 &
+            APP_PID=$!
+            # Wait for it to come up, then hit an endpoint
+            for i in $(seq 1 30); do
+              if curl -sf http://localhost:8000/docs > /dev/null; then
+                echo "App is up and responding"
+                kill $APP_PID
+                exit 0
+              fi
+              echo "Waiting for app..."; sleep 1
+            done
+            echo "App failed to start"; kill $APP_PID; exit 1
+          environment:
+            DATABASE_URL: postgresql+psycopg://postgres:password@localhost:5432/userdb
+
 workflows:
   build-test-deploy:
     jobs:

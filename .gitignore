@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
+# Environment / secrets
+.env
+.env.test
+
+# OS / editor
+.DS_Store
+.vscode/          # optional — omit this line if you want to commit workspace settings

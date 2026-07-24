@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+
 from sqlalchemy import DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-#from config import settings
+from config import settings
 from db import Base
 
 
@@ -37,6 +38,7 @@ class User(Base):
             return f"https://{settings.s3_bucket_name}.s3.{settings.s3_region}.amazonaws.com/profile_pics/{self.image_file}"
         return "/static/profile_pics/default.jpg"
 
+
 class PasswordResetToken(Base):
     __tablename__ = "password_reset_tokens"
 
@@ -54,7 +56,6 @@ class PasswordResetToken(Base):
 
     user: Mapped[User] = relationship(back_populates="reset_tokens")
 
-    
 
 class Pokemon(Base):
     __tablename__ = "pokemon"
@@ -72,4 +73,3 @@ class Pokemon(Base):
     )
 
     owner: Mapped[User] = relationship(back_populates="pokemons")
-

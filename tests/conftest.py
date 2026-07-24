@@ -1,59 +1,46 @@
-
 import os
 from collections.abc import AsyncGenerator
 
-
-# Base de datos de pruebas, se mantiene el mismo usario  y base de datos que producción
-# debido a que es el que se genera con docker-compose, pero debería de ser diferente
-os.environ["DATABASE_URL"] = (
-#    "postgresql+psycopg://userdb_test:password_test@localhost:5432/test_userdb"
-    "postgresql+psycopg://userdb:password@localhost:5432/userdb"
-)
-# os.environ["S3_BUCKET_NAME"] = "test-bucket"
-# os.environ["SECRET_KEY"] = "test-secret-key-for-testing-only"
-
-# os.environ["S3_ACCESS_KEY_ID"] = "testing"
-# os.environ["S3_SECRET_ACCESS_KEY"] = "testing"
-# os.environ["S3_REGION"] = "us-east-1"
-
-# # For boto3, the client searches for this variables.
-# os.environ["AWS_ACCESS_KEY_ID"] = "testing"
-# os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
-# os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
+# Switch environmental variables to testing (only database here, but it's a good practice)
+os.environ.setdefault("APP_ENV", "test")
 
 # The import order matters, the os variables have to be initialized before adding the db and the app
 # import boto3
 # from moto import mock_aws
+import asyncio
+import sys
+from unittest.mock import AsyncMock
+
 import pytest
+from asgi_lifespan import LifespanManager
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
-import sys
-import asyncio
-
+from config import settings
 from db import Base, get_db
 from main import app
 
-
-
-@pytest.fixture(scope="session")
-def anyio_backend():
-    return "asyncio"
-
 pytest_plugins = ["anyio"]
 
+
 @pytest.fixture(scope="session")
 def anyio_backend():
+    if sys.platform == "win32":
+        return ("asyncio", {"loop_factory": asyncio.SelectorEventLoop})
     return "asyncio"
+
 
 @pytest.fixture(scope="session")
 def test_engine():
+    # Print just to valdiate that the change of the database is correctly
+    # print(f"\n>>> TEST DB URL: {settings.database_url}\n")
     engine = create_async_engine(
-        os.environ["DATABASE_URL"],
-        poolclass=NullPool, # Can cause issues between test like connection already closed and so on
+        settings.database_url,  # ← from Settings (which loaded .env.test), not os.environ
+        poolclass=NullPool,
     )
     return engine
+
 
 @pytest.fixture(scope="session")
 async def setup_database(test_engine):
@@ -67,7 +54,8 @@ async def setup_database(test_engine):
 
     await test_engine.dispose()
 
-@pytest.fixture # Function scope, which is the default, running for each function
+
+@pytest.fixture  # Function scope, which is the default, running for each function
 async def db_session(
     test_engine,
     setup_database,
@@ -79,7 +67,7 @@ async def db_session(
         bind=conn,
         class_=AsyncSession,
         expire_on_commit=False,
-        join_transaction_mode="create_savepoint", # This is the fake commit magic
+        join_transaction_mode="create_savepoint",  # This is the fake commit magic
     )
 
     async with test_async_session() as session:
@@ -91,35 +79,41 @@ async def db_session(
             await conn.close()
 
 
-# S3, using moto3 instead of uploading to S3
-# @pytest.fixture
-# def mocked_aws():
-#     with mock_aws():
-#         s3 = boto3.client("s3", region_name="us-east-1")
-#         s3.create_bucket(Bucket=os.environ["S3_BUCKET_NAME"])
-#         yield s3
+# Mocking extenral dependencies
+@pytest.fixture
+def pokeapi_mock():
+    mock = AsyncMock()
+    mock.get_name.return_value = None
+    mock.get_names.return_value = {}
+    return mock
+
 
 # Client, with dependencies override
 @pytest.fixture
-async def client(
-    db_session: AsyncSession,
-    mocked_aws,
-) -> AsyncGenerator[AsyncClient]:
-
+async def client(db_session: AsyncSession, pokeapi_mock) -> AsyncGenerator[AsyncClient]:
     async def override_get_db():
         yield db_session
 
     app.dependency_overrides[get_db] = override_get_db
 
-    async with AsyncClient(
-        transport=ASGITransport(app=app), # This is what makes the call of the different http request
-        base_url="http://test", # It doesn't matter which url is used, just to have one
-    ) as ac:
-        yield ac
+    async with LifespanManager(app):
+        # lifespan startup has run → app.state.pokeapi_client is a real PokeAPIClient.
+        # Stub only the methods that would hit the network:
+
+        # General mock for the class
+        app.state.pokeapi_client = pokeapi_mock
+
+        # Specific mock for class's methods
+        # app.state.pokeapi_client.get_name = AsyncMock(return_value=None)
+        # app.state.pokeapi_client.get_names = AsyncMock(return_value={})
+
+        async with AsyncClient(
+            transport=ASGITransport(app=app),
+            base_url="http://test",
+        ) as ac:
+            yield ac
 
     app.dependency_overrides.clear()
-
-    # startup  code won't apply here, use the ASGI lifespan, which is outside of the scope.
 
 
 # Authenthication fixers
@@ -161,8 +155,8 @@ async def login_user(
 def auth_header(token: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {token}"}
 
-#10:49:52
-# Our test will not touch production or development database.
-# We are going to create a separate postgres database. 
-# Not using sqllite because it's begaviour is different.
 
+# 10:49:52
+# Our test will not touch production or development database.
+# We are going to create a separate postgres database.
+# Not using sqllite because it's begaviour is different.

@@ -23,7 +23,6 @@ from .entity import (
     Token,
     UserCreate,
     UserPrivate,
-    UserPublic,
     UserUpdate,
 )
 from .repository import UserRepository

@@ -69,7 +69,7 @@ async def create_pokemon(
 
 
 @router.put("/{id}", response_model=PokemonResponse)
-async def update_pokemon(
+async def update_pokemon_full(
     id: int,
     pokemon: PokemonCreate,
     current_user: CurrentUser,
@@ -79,7 +79,7 @@ async def update_pokemon(
 
 
 @router.patch("/{id}", response_model=PokemonResponse)
-async def update_pokemon(
+async def update_pokemon_partial(
     id: int,
     pokemon: PokemonUpdate,
     current_user: CurrentUser,

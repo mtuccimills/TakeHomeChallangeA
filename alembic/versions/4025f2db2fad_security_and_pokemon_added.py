@@ -5,17 +5,17 @@ Revises: 3fa31638d928
 Create Date: 2026-07-16 12:28:26.795103
 
 """
-from typing import Sequence, Union
+from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = '4025f2db2fad'
-down_revision: Union[str, Sequence[str], None] = '3fa31638d928'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | Sequence[str] | None = '3fa31638d928'
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:

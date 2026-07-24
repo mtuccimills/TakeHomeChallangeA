@@ -79,7 +79,7 @@ async def test_me_fail(client: AsyncClient):
 # Me
 @pytest.mark.anyio
 async def test_me_successful(client: AsyncClient):
-    user = await create_test_user(client)
+    await create_test_user(client)
     token = await login_user(client)
     header = auth_header(token)
 

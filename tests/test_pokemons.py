@@ -15,7 +15,7 @@ async def test_create_pokemon_requires_auth(client: AsyncClient):
 
 @pytest.mark.anyio
 async def test_create_pokemon_invalid_id(client: AsyncClient):
-    user = await create_test_user(client)
+    await create_test_user(client)
     token = await login_user(client)
     headers = auth_header(token)
     resp = await client.post(
@@ -26,9 +26,8 @@ async def test_create_pokemon_invalid_id(client: AsyncClient):
 
 @pytest.mark.anyio
 async def test_list_pokemons_empty(client: AsyncClient):
-    user = await create_test_user(client)
-    token = await login_user(client)
-    headers = auth_header(token)
+    await create_test_user(client)
+    await login_user(client)
     resp = await client.get("/api/v1/pokemons/")
     assert resp.status_code == 404
 

@@ -1,0 +1,53 @@
+version: 2.1
+jobs:
+  test:
+    docker:
+      - image: cimg/python:3.13
+      - image: cimg/postgres:15.6
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: userdb
+    environment:
+      APP_ENV: test
+      DATABASE_URL: postgresql+psycopg://postgres:password@localhost:5432/test_userdb
+      SECRET_KEY: 3ac467db8c669e18f91db5498cb625f0dc9d10521483089557a0931788700cbe
+      EXTERNAL_API_URL: https://pokeapi.co/api/v2
+
+    steps:
+      - checkout
+      - run:
+          name: Install uv
+          command: |
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$BASH_ENV"
+      - run:
+          name: Install dependencies
+          command: uv sync --frozen
+      - run:
+          name: Wait for Postgres
+          command: |
+            for i in $(seq 1 30); do
+              if pg_isready -h localhost -p 5432 -U postgres; then
+                echo "Postgres is ready"; break
+              fi
+              echo "Waiting for Postgres..."; sleep 1
+            done
+      - run:
+          name: Create test database
+          command: |
+            PGPASSWORD=password psql -h localhost -U postgres -d userdb \
+              -c "CREATE DATABASE test_userdb;"
+
+      - run:
+          name: Lint (Ruff)
+          command: uv run ruff check .
+
+      - run:
+          name: Run tests
+          command: uv run pytest tests -v
+
+workflows:
+  build-test-deploy:
+    jobs:
+      - test

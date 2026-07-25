@@ -1,7 +1,5 @@
 version: 2.1
-orbs:
-  coveralls: coveralls/coveralls@2.2.5
-  
+
 jobs:
   test:
     docker:
@@ -45,10 +43,12 @@ jobs:
       - run:
           name: Lint (Ruff)
           command: uv run ruff check .
-
       - run:
-          name: Run tests
-          command: uv run pytest tests -v
+          name: Run tests with coverage
+          command: uv run pytest tests --cov=routers --cov=clients --cov-report=lcov
+      - run:
+          name: Upload to Coveralls
+          command: uv run coveralls
 
   integration:
     machine:
@@ -70,6 +70,7 @@ jobs:
             docker compose logs   # dump logs on failure for debugging
             docker compose ps
             exit 1
+
 workflows:
   build-test-deploy:
     jobs:

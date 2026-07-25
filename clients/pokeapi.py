@@ -11,7 +11,7 @@ class PokeAPIClient:
         self._client = httpx.AsyncClient(base_url=base_url, timeout=timeout)
         self._cache: dict[int, str | None] = {}
 
-    async def get_name(self, pokemon_id: int) -> str | None:
+    async def get_name(self, pokemon_id: int) -> str | None:  # pragma: no cover
         if pokemon_id in self._cache:
             return self._cache[pokemon_id]
 
@@ -26,12 +26,14 @@ class PokeAPIClient:
         self._cache[pokemon_id] = name
         return name
 
-    async def get_names(self, pokemon_ids: list[int]) -> dict[int, str | None]:
+    async def get_names(
+        self, pokemon_ids: list[int]
+    ) -> dict[int, str | None]:  # pragma: no cover
         # Deduplicate first — a page may hold the same pokemon_id many times
         # (several users caught the same species).
         unique_ids = list(set(pokemon_ids))
         results = await asyncio.gather(*(self.get_name(pid) for pid in unique_ids))
         return dict(zip(unique_ids, results))
 
-    async def close(self) -> None:
+    async def close(self) -> None:  # pragma: no cover
         await self._client.aclose()

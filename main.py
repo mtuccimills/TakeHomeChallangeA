@@ -15,6 +15,10 @@ from routers.users import controller
 # --rm test delete the container when it exist, since run stopped it, but didn't deleted it. For cleaningness
 # docker compose -f app.yaml --profile test run --rm test
 
+# adding coverals
+# uv add --dev pytest-cov
+# uv run pytest --cov=. tests/
+
 
 # 36:25 readme
 # The readme needs to have

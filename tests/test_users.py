@@ -258,3 +258,97 @@ async def test_change_password_wrong_current(client: AsyncClient):
     )
     assert resp.status_code == 400
     assert resp.json()["detail"] == "Current password is incorrect"
+
+
+@pytest.mark.anyio
+async def test_find_user_by_email(client: AsyncClient):
+    await create_test_user(client)
+    resp = await client.get("/api/v1/users/email/test@example.com")
+    assert resp.status_code == 200
+
+
+@pytest.mark.anyio
+async def test_find_user_by_email_not_found(client: AsyncClient):
+    resp = await client.get("/api/v1/users/email/nobody@example.com")
+    assert resp.status_code == 404
+
+
+@pytest.mark.anyio
+async def test_find_user_by_username(client: AsyncClient):
+    await create_test_user(client)
+    resp = await client.get("/api/v1/users/username/testuser")
+    assert resp.status_code == 200
+
+
+@pytest.mark.anyio
+async def test_find_user_by_username_not_found(client: AsyncClient):
+    resp = await client.get("/api/v1/users/username/ghost")
+    assert resp.status_code == 404
+
+
+@pytest.mark.anyio
+async def test_get_users_empty(client: AsyncClient):
+    resp = await client.get("/api/v1/users/")
+    assert resp.status_code == 404  # "No users found" branch
+
+
+@pytest.mark.anyio
+async def test_update_full_user(client: AsyncClient):
+    user = await create_test_user(client)
+    token = await login_user(client)
+    resp = await client.put(
+        f"/api/v1/users/{user['id']}",
+        json={
+            "username": "updated",
+            "email": "updated@example.com",
+            "password": "newpass123",
+        },
+        headers=auth_header(token),
+    )
+    assert resp.status_code == 200
+
+
+@pytest.mark.anyio
+async def test_update_full_forbidden(client: AsyncClient):
+    owner = await create_test_user(client)
+    await create_test_user(client, username="other", email="other@example.com")
+    other_token = await login_user(client, email="other@example.com")
+    resp = await client.put(
+        f"/api/v1/users/{owner['id']}",
+        json={"username": "x", "email": "x@example.com", "password": "pass1234"},
+        headers=auth_header(other_token),
+    )
+    assert resp.status_code == 403
+
+
+@pytest.mark.anyio
+async def test_delete_user_success(client: AsyncClient):
+    """Authorized delete of one's own account → 204, and the user is gone."""
+    user = await create_test_user(client)
+    token = await login_user(client)
+
+    resp = await client.delete(
+        f"/api/v1/users/{user['id']}",
+        headers=auth_header(token),
+    )
+    assert resp.status_code == 204
+
+    # confirm it's actually gone
+    resp = await client.get(f"/api/v1/users/{user['id']}")
+    assert resp.status_code == 404
+
+
+@pytest.mark.anyio
+async def test_delete_user_forbidden(client: AsyncClient):
+    """Deleting a DIFFERENT user's account → 403."""
+    owner = await create_test_user(client)  # user A (id we'll target)
+    # user B, logged in
+    await create_test_user(client, username="other", email="other@example.com")
+    other_token = await login_user(client, email="other@example.com")
+
+    resp = await client.delete(
+        f"/api/v1/users/{owner['id']}",  # B tries to delete A
+        headers=auth_header(other_token),
+    )
+    assert resp.status_code == 403
+    assert resp.json()["detail"] == "You are not authorized to delete this user"

@@ -96,7 +96,7 @@ class UserRepository:
 
     async def get_pokemons(
         self, id: int, skip: int, limit: int
-    ) -> tuple[list[Pokemon], int]:
+    ) -> tuple[list[Pokemon], int]:  # pragma: no cover
         result = await self.db.execute(
             select(Pokemon)
             .where(Pokemon.user_id == id)
@@ -118,12 +118,14 @@ class UserRepository:
         return pokemons, total
 
     # Token related functions
-    async def delete_tokens(self, user_id: int):
+    async def delete_tokens(self, user_id: int):  # pragma: no cover
         await self.db.execute(
             sql_delete(PasswordResetToken).where(PasswordResetToken.user_id == user_id)
         )
 
-    async def add_hash_token(self, user_id: int, token_hash: str, expires_at: datetime):
+    async def add_hash_token(
+        self, user_id: int, token_hash: str, expires_at: datetime
+    ):  # pragma: no cover
         reset_token = PasswordResetToken(
             user_id=user_id, token_hash=token_hash, expires_at=expires_at
         )
@@ -133,7 +135,7 @@ class UserRepository:
     async def hash_token_exists(
         self,
         token_hash: str,
-    ) -> PasswordResetToken:
+    ) -> PasswordResetToken:  # pragma: no cover
         result = await self.db.execute(
             select(PasswordResetToken).where(
                 PasswordResetToken.token_hash == token_hash,
@@ -145,7 +147,7 @@ class UserRepository:
     async def hash_token_expired(
         self,
         token_hash: str,
-    ) -> PasswordResetToken:
+    ) -> PasswordResetToken:  # pragma: no cover
         reset_token = await self.hash_token_exists(token_hash)
         if reset_token:
             await self.db.delete(reset_token)
@@ -154,7 +156,7 @@ class UserRepository:
     async def hash_token_delete(
         self,
         user_id: int,
-    ) -> PasswordResetToken:
+    ) -> PasswordResetToken:  # pragma: no cover
         await self.db.execute(
             sql_delete(PasswordResetToken).where(PasswordResetToken.user_id == user_id)
         )

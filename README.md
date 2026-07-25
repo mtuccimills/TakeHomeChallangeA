@@ -12,6 +12,8 @@ The application follows a layered **Clean Architecture** (controller → service
 
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/mtuccimills/TakeHomeChallangeA/tree/main.svg?style=svg&circle-token=CCIPRJ_4NDRbUyQMf5JWMqsB8hQFX_7c8706b28eaf239756a436e4c48685ee52e65c9c)](https://dl.circleci.com/status-badge/redirect/gh/mtuccimills/TakeHomeChallangeA/tree/main)
 
+[![Coverage Status](https://coveralls.io/repos/github/mtuccimills/TakeHomeChallangeA/badge.svg?branch=main)](https://coveralls.io/github/mtuccimills/TakeHomeChallangeA?branch=main)
+
 ## Features
 
 - **User management** — registration, listing, retrieval by id / email / username, full and partial updates, and deletion, with ownership enforcement so users can only modify their own account.

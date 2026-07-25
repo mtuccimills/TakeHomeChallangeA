@@ -10,7 +10,7 @@ The application follows a layered **Clean Architecture** (controller → service
 
 ## Badges
 
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/mtuccimills/TakeHomeChallangeA/tree/main.svg?style=svg&circle-token=CCIPRJ_ABxG9X9P2ZXkX9p84DcFim_84accbb01b9d1b36d1527cf250414fbb99bf6aa3)](https://dl.circleci.com/status-badge/redirect/gh/mtuccimills/TakeHomeChallangeA/tree/main)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/mtuccimills/TakeHomeChallangeA/tree/main.svg?style=svg&circle-token=CCIPRJ_4NDRbUyQMf5JWMqsB8hQFX_7c8706b28eaf239756a436e4c48685ee52e65c9c)](https://dl.circleci.com/status-badge/redirect/gh/mtuccimills/TakeHomeChallangeA/tree/main)
 
 ## Features
 

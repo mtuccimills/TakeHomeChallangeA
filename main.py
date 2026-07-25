@@ -18,6 +18,7 @@ from routers.users import controller
 # adding coverals
 # uv add --dev pytest-cov
 # uv run pytest --cov=. tests/
+# Add token on the circle ci's project->project configuration -> environmental variables
 
 
 # 36:25 readme

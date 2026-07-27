@@ -16,11 +16,11 @@ from routers.users import controller
 # docker compose -f app.yaml --profile test run --rm test
 
 # adding coverals
-# uv add --dev pytest-cov
+# uv add --dev coveralls pytest-cov
 # uv run pytest --cov=. tests/
 # Add token on the circle ci's project->project configuration -> environmental variables
 
-
+# Part 5
 # 36:25 readme
 # The readme needs to have
 # Title witha  description (mentions how the request should be Content-type:application/json)
@@ -41,7 +41,7 @@ from routers.users import controller
 
 # Do we use precommit hooks?
 
-# 48 min
+# 1:26 min
 
 
 @asynccontextmanager

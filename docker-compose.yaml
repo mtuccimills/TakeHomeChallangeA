@@ -28,6 +28,18 @@ services:
         condition: service_healthy   # wait until Postgres actually accepts connections
     restart: "no"                    # run once, then exit
 
+  seed:
+    build: .
+    command: python seed.py
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully   # seed AFTER migrations
+    restart: "no"
+
   app:
     build: .
     command: uvicorn main:app --host 0.0.0.0 --port 8000
@@ -36,8 +48,8 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     depends_on:
-      migrate:
-        condition: service_completed_successfully   # app starts only after migrate exits 0
+      seed:
+        condition: service_completed_successfully   # app starts only after seeds happens
     ports:
       - 8000:8000
 

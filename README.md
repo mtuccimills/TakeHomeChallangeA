@@ -65,6 +65,8 @@ The application follows a layered **Clean Architecture** (controller → service
 - Clean Architecture: To be able to habdle further changess ie future in a proper way.
 - UV: uv is a dependency manager that allows us to have a better segregation between our projects and improves speed compare to pip.
 - SQLAlchemy: Because it is an ORM which is easy to use and has great documentation.
+- Alembic: We've chosen to use alembic as the dependency to manage migrations since it's one of the most common libraries and has high documentation.
+- Seed file: We've decided to manage seeding on a different file separated from alembic's migration to have properly separated the schema (structure) from the mock data.
 - Docker: To make portabele the app
 - Docker profiles: I decided to use a test profile on the docker-compose to prevent us from generating second docker-coompose file soley for testing purposes
 - PyTest: Is the most common library for testing in python.
@@ -173,6 +175,15 @@ docker compose down -v       # stop and remove the database volume (wipes all da
 
 The database schema is created and kept up to date **automatically**. On startup, a dedicated `migrate` service runs `alembic upgrade head` against the application database *before* the API starts, ensuring the structure is always current. No manual migration step is required.
 
+After generating the database, a second script is run to add the seed information. This information includes the following users for you to properly test the system and login functions:
+
+| Username | Email               | Password     | Pokémon (by `pokemon_id`) |
+| -------- | ------------------- | ------------ | ------------------------- |
+| Ash      | ash@example.com     | pikachu123   | 25 (Pikachu), 1 (Bulbasaur) |
+| Misty    | misty@example.com   | staryu123    | 120 (Staryu), 121 (Starmie) |
+
+> Log in via `POST /api/v1/users/token` with the email as the username and the password above to obtain a JWT, then use it as a `Bearer` token on the authenticated routes.
+
 A separate test database (`test_userdb`) is provisioned automatically the first time the PostgreSQL volume is created, via the `init-test-db.sql` initialization script mounted into the container.
 
 > **Note:** the test-database initialization script only runs when the PostgreSQL data volume is created from scratch. If the test database is ever missing, recreate the volume with `docker compose down -v` followed by `docker compose up --build`.
@@ -226,8 +237,8 @@ For a production deployment, the recommended adjustments are: supply strong secr
 ## Areas to improve
 
 - Generic method should be used to mock endpoints.
+- We could add user routes for forgotten password via email.
 - Error handling could be improved (prevent 500 errors)
-- A seed migration would be useful to have an already working app with data
 - Deployment could be done
 
 
